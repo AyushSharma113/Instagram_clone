@@ -5,3 +5,6 @@ change type to module form commonjs
 
 genrate tsconfig.json file
 npx tsc --init  
+
+
+https://youtu.be/ZgBdPqKVpEk?si=9RUwaJzEdYq87-a5
