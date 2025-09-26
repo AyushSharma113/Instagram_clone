@@ -1,8 +1,8 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document, Types, type InferSchemaType } from 'mongoose';
 
 
 
-// 📸 2. Post Relationships
+//  Post Relationships
 
 // Each Post:
 // Belongs to one User (One-to-One via author)
@@ -10,20 +10,8 @@ import { Schema, model, Document, Types } from 'mongoose';
 // Can have many Comments (One-to-Many)
 
 
-
-// Step 1: Define the TypeScript interface
-export interface IPost extends Document {
-  caption?: string;
-  image: string;
-  author: Types.ObjectId;
-  likes: Types.ObjectId[];
-  comments: Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Step 2: Define the Mongoose schema
-const postSchema = new Schema<IPost>(
+// Step 1: Define the Mongoose schema
+const postSchema = new Schema(
   {
     caption: { type: String, default: '' },
     image: { type: String, required: true },
@@ -33,6 +21,11 @@ const postSchema = new Schema<IPost>(
   },
   { timestamps: true }
 );
+
+
+// step 2: infer the typescript type from the schema 
+export type IPost = InferSchemaType<typeof postSchema>
+
 
 // Step 3: Export the model
 export const Post = model<IPost>('Post', postSchema);

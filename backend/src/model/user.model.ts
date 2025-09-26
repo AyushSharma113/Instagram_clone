@@ -1,7 +1,7 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Types, type InferSchemaType } from 'mongoose';
 
 
-// 🔗 1. User Relationships
+// . User Relationships
 
 // Each User:
 // Can create many Posts (One-to-Many)
@@ -12,24 +12,8 @@ import { Schema, model, Document, Types } from 'mongoose';
 // Can receive and send many Messages (Two One-to-Many relationships)
 
 
-// Step 1: Define the TypeScript interface
-export interface IUser extends Document {
-  username: string;
-  email: string;
-  password: string;
-  profilePicture?: string;
-  bio: string;
-  gender?: 'male' | 'female';
-  followers: Types.ObjectId[];
-  following: Types.ObjectId[];
-  posts: Types.ObjectId[];
-  bookmarks: Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Step 2: Define the Mongoose schema
-const userSchema = new Schema<IUser>(
+// Step 1: Define the Mongoose schema
+const userSchema = new Schema(
   {
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -45,5 +29,28 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
+
+// Step 2: Infer the TypeScript type from the schema
+export  type IUser = InferSchemaType<typeof userSchema>
+
 // Step 3: Export the model
 export const User = model<IUser>('User', userSchema);
+
+
+// old way of typescript 
+
+// Step 1: Define the TypeScript interface
+// export interface IUser extends Document {
+//   username: string;
+//   email: string;
+//   password: string;
+//   profilePicture?: string;
+//   bio: string;
+//   gender?: 'male' | 'female';
+//   followers: Types.ObjectId[];
+//   following: Types.ObjectId[];
+//   posts: Types.ObjectId[];
+//   bookmarks: Types.ObjectId[];
+//   createdAt: Date;
+//   updatedAt: Date;
+// }

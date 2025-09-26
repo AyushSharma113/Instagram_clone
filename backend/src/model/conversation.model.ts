@@ -1,23 +1,14 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document, Types, type InferSchemaType } from 'mongoose';
 
 
-// 🧵 5. Conversation Relationships
+//  Conversation Relationships
 // Each Conversation:
 // Has multiple participants (array of Users)
 // Has multiple messages (array of Messages)
 
 
-
-// Step 1: Define the TypeScript interface
-export interface IConversation extends Document {
-  participants: Types.ObjectId[];
-  messages: Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Step 2: Define the Mongoose schema
-const conversationSchema = new Schema<IConversation>(
+// Step 1: Define the Mongoose schema
+const conversationSchema = new Schema(
   {
     participants: [
       {
@@ -35,6 +26,11 @@ const conversationSchema = new Schema<IConversation>(
   },
   { timestamps: true } // Adds createdAt and updatedAt
 );
+
+
+// step 2: infer the typescript type from the schema 
+export type IConversation = InferSchemaType<typeof conversationSchema>
+
 
 // Step 3: Export the model
 export const Conversation = model<IConversation>('Conversation', conversationSchema);

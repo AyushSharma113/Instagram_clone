@@ -1,23 +1,16 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Document, Types, type InferSchemaType } from 'mongoose';
 
 
-// 📩 4. Message Relationships
+//  Message Relationships
 // Each Message:
 // Is sent by one User (senderId)
 // Is received by one User (receiverId)
 // Belongs to a Conversation indirectly (via its inclusion in Conversation.messages[])
 
-// Step 1: Define the TypeScript interface
-export interface IMessage extends Document {
-  senderId: Types.ObjectId;
-  receiverId: Types.ObjectId;
-  message: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
-// Step 2: Define the Mongoose schema
-const messageSchema = new Schema<IMessage>(
+
+// Step 1: Define the Mongoose schema
+const messageSchema = new Schema(
   {
     senderId: {
       type: Schema.Types.ObjectId,
@@ -36,6 +29,9 @@ const messageSchema = new Schema<IMessage>(
   },
   { timestamps: true } // Adds createdAt and updatedAt fields
 );
+
+// step 2: infer the typescript type from the schema 
+export type IMessage = InferSchemaType<typeof messageSchema>
 
 // Step 3: Export the model
 export const Message = model<IMessage>('Message', messageSchema);
