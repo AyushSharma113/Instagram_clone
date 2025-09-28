@@ -4,6 +4,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Post } from "../model/post.model.ts";
 import { populate } from "dotenv";
+import getDataUri from "../utils/dataUri.ts";
+import cloudinary from "../utils/claudinary.ts";
+
+interface AuthRequest extends Request {
+  id?: string;
+}
 
 export const register = async (
   req: Request,
@@ -47,7 +53,10 @@ export const register = async (
   }
 };
 
-export const login = async (req: Request, res: Response): Promise<Response | void> => {
+export const login = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -92,25 +101,30 @@ export const login = async (req: Request, res: Response): Promise<Response | voi
       })
     );
 
-    const filteredPosts = populatedPosts.filter(post => post !== null)
-    
+    const filteredPosts = populatedPosts.filter((post) => post !== null);
 
-     const userData = {
-         _id: user._id,
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicture,
-            bio: user.bio,
-            followers: user.followers,
-            following: user.following,
-            posts: filteredPosts
-    }
-    
-      return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
-            message: `Welcome back ${userData.username}`,
-            success: true,
-            user: userData
-        });
+    const userData = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      followers: user.followers,
+      following: user.following,
+      posts: filteredPosts,
+    };
+
+    return res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      })
+      .json({
+        message: `Welcome back ${userData.username}`,
+        success: true,
+        user: userData,
+      });
   } catch (error) {
     console.log(error as Error);
     return res.status(500).json({
@@ -120,20 +134,95 @@ export const login = async (req: Request, res: Response): Promise<Response | voi
   }
 };
 
-
-export const logout = async (req: Request, res: Response): Promise<Response | void> => {
-    try {
-        
-          return res.cookie("token", "", { maxAge: 0 }).json({
-            message: 'Logged out successfully.',
-            success: true
-        });
-        
-    } catch (error) {
-         console.log(error as Error);
+export const logout = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  try {
+    return res.cookie("token", "", { maxAge: 0 }).json({
+      message: "Logged out successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error as Error);
     return res.status(500).json({
       message: "Internal server error.",
       success: false,
     });
+  }
+};
+
+export const getProfile = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  try {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(401).json({
+        message: "something is wrong",
+        success: false,
+      });
     }
-}
+
+    let user = await User.findById(userId)
+      .populate({ path: "posts", options: { sort: { createdAt: -1 } } })
+      .populate("bookmarks");
+
+    return res.status(200).json({
+      user,
+      success: true,
+    });
+  } catch (error) {
+    console.log(error as Error);
+    return res.status(401).json({
+      message: "internal server error",
+      success: false,
+    });
+  }
+};
+
+export const editProfile = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  try {
+    const userId = (req as AuthRequest).id;
+    const { bio, gender } = req.body;
+    const profilePicture = req.file;
+
+    let cloudResponse;
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    if (profilePicture) {
+      const fileUri = getDataUri(profilePicture);
+      cloudResponse = await cloudinary.uploader.upload(fileUri);
+    }
+
+    if (bio) user.bio = bio;
+    if (gender) user.gender = gender;
+    if (profilePicture && cloudResponse?.secure_url)
+      user.profilePicture = cloudResponse.secure_url;
+    
+    await user.save();
+
+    return res.status(200).json({
+      message: "Profile updated.",
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.log(error as Error);
+    return res.status(401).json({
+      message: "internal server error",
+      success: false,
+    });
+  }
+};

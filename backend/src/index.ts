@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import connectDB from './utils/db.ts'
 import dotenv from "dotenv";
 import path from "path";
+import userRoute from './routes/user.route.ts'
 
 const __dirname = path.resolve();
 
@@ -24,6 +25,9 @@ const corsOptions = {
     credentials: true
 }
 app.use(cors(corsOptions));
+
+
+app.use("/api/v1/user", userRoute)
 
 
 app.get('/', (req, res)=> {

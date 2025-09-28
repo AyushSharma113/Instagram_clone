@@ -40,3 +40,4 @@ const isAuthenticated = async (req: AuthenticatedRequest, res: Response, next: N
 
 
 
+export default isAuthenticated;
