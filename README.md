@@ -122,35 +122,6 @@ The frontend server will run on `http://localhost:3000`.
 4. **Profile**: You can view your own profile, see the posts you've made, and view your followers and following.
 5. **Follow/Unfollow**: You can follow and unfollow users to see their posts in your feed.
 
-## API Endpoints
-
-### Authentication
-
-* **POST /api/auth/register**: Register a new user.
-* **POST /api/auth/login**: Log in an existing user and receive a JWT token.
-* **GET /api/auth/me**: Get the current user's profile data (requires JWT).
-
-### Posts
-
-* **POST /api/posts**: Create a new post (requires authentication).
-* **GET /api/posts**: Get all posts.
-* **GET /api/posts/\:id**: Get a specific post by ID.
-* **PUT /api/posts/like/\:id**: Like a post (requires authentication).
-* **PUT /api/posts/comment/\:id**: Add a comment to a post (requires authentication).
-
-### Users
-
-* **GET /api/users/\:id**: Get a user's profile by ID.
-* **PUT /api/users/follow/\:id**: Follow a user (requires authentication).
-* **PUT /api/users/unfollow/\:id**: Unfollow a user (requires authentication).
-
-## Deployment
-
-To deploy the application to production:
-
-1. Deploy the backend to a cloud platform (e.g., Heroku, DigitalOcean).
-2. Deploy the frontend to a static hosting provider (e.g., Netlify, Vercel).
-3. Update the environment variables (e.g., API URL) in the frontend to point to the production backend.
 
 ## Contributing
 
