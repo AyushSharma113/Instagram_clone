@@ -94,16 +94,6 @@ Install frontend dependencies:
 npm install
 ```
 
-#### b. Create `.env` file
-
-Create a `.env` file in the frontend directory and add the following:
-
-```
-REACT_APP_API_URL=http://localhost:5000
-```
-
-* `REACT_APP_API_URL`: The URL of your backend server.
-
 #### c. Start the frontend
 
 Start the frontend development server:
