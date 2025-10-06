@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom';
 import Feed from './Feed';
+import RightSidebar from './RightSidebar';
 
 const Home = () => {
 
@@ -10,6 +11,7 @@ const Home = () => {
                 <Feed />
                 <Outlet />
             </div>
+               <RightSidebar />
         </div>
     )
 }

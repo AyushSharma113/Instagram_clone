@@ -1,10 +1,27 @@
-import { Heart, Home, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
-import React from 'react'
+import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
+
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+
+
+
+
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import { Button } from './ui/button'
 
 const LeftSidebar = () => {
-const likeNotification: [string] = [];
+    
+ const likeNotification: string[] = []
 
-      const sidebarItems = [
+
+    const logoutHandler = async () => {
+      
+    }
+
+    const sidebarHandler = () => {
+     
+    }
+
+    const sidebarItems = [
         { icon: <Home />, text: "Home" },
         { icon: <Search />, text: "Search" },
         { icon: <TrendingUp />, text: "Explore" },
@@ -14,7 +31,8 @@ const likeNotification: [string] = [];
         {
             icon: (
                 <Avatar className='w-6 h-6'>
-                    <AvatarImage src={user?.profilePicture} alt="@shadcn" />
+                    {/* <AvatarImage src={user?.profilePicture} alt="@shadcn" /> */}
+                    <AvatarImage  alt="@shadcn" />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
             ),
@@ -22,10 +40,7 @@ const likeNotification: [string] = [];
         },
         { icon: <LogOut />, text: "Logout" },
     ]
-    
-    
-    
-  return (
+    return (
         <div className='fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen'>
             <div className='flex flex-col'>
                 <h1 className='my-8 pl-3 font-bold text-xl'>LOGO</h1>
@@ -33,7 +48,7 @@ const likeNotification: [string] = [];
                     {
                         sidebarItems.map((item, index) => {
                             return (
-                                <div onClick={() => sidebarHandler(item.text)} key={index} className='flex items-center gap-3 relative hover:bg-gray-100 cursor-pointer rounded-lg p-3 my-3'>
+                                <div onClick={() => sidebarHandler()} key={index} className='flex items-center gap-3 relative hover:bg-gray-100 cursor-pointer rounded-lg p-3 my-3'>
                                     {item.icon}
                                     <span>{item.text}</span>
                                     {
@@ -48,12 +63,14 @@ const likeNotification: [string] = [];
                                                             likeNotification.length === 0 ? (<p>No new notification</p>) : (
                                                                 likeNotification.map((notification) => {
                                                                     return (
-                                                                        <div key={notification.userId} className='flex items-center gap-2 my-2'>
+                                                                        <div  className='flex items-center gap-2 my-2'>
                                                                             <Avatar>
-                                                                                <AvatarImage src={notification.userDetails?.profilePicture} />
+                                                                                {/* <AvatarImage src={notification?.userDetails?.profilePicture} /> */}
+                                                                                <AvatarImage  />
                                                                                 <AvatarFallback>CN</AvatarFallback>
                                                                             </Avatar>
-                                                                            <p className='text-sm'><span className='font-bold'>{notification.userDetails?.username}</span> liked your post</p>
+                                                                            {/* <p className='text-sm'><span className='font-bold'>{notification?.userDetails?.username}</span> liked your post</p> */}
+                                                                            <p className='text-sm'><span className='font-bold'>ayush</span> liked your post</p>
                                                                         </div>
                                                                     )
                                                                 })
@@ -71,7 +88,7 @@ const likeNotification: [string] = [];
                 </div>
             </div>
 
-            <CreatePost open={open} setOpen={setOpen} />
+            {/* <CreatePost open={open} setOpen={setOpen} /> */}
 
         </div>
     )
