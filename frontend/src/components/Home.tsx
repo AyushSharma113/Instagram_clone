@@ -11,7 +11,7 @@ const Home = () => {
                 <Feed />
                 <Outlet />
             </div>
-               <RightSidebar />
+               {/* <RightSidebar /> */}
         </div>
     )
 }
