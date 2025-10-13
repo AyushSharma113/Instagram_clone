@@ -1,8 +1,12 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "./ui/button"
 import { Loader2 } from "lucide-react"
 import { Input } from "./ui/input";
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "@/redux/authslice";
 
 const Login = () => {
     const [input, setInput] = useState({
@@ -10,17 +14,58 @@ const Login = () => {
         password: "",
       } satisfies Record<string, string>);
 
-    const loading = false;
+      const navigate = useNavigate()
+      const dispatch = useDispatch()
+    const [loading, setLoading] = useState(false)
  
 
       const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput({ ...input, [e.target.name]: e.target.value });
       };
     
-      const loginHandler = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log(input);
-      };
+     const loginHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // console.log(input);
+
+    try {
+      setLoading(true)
+
+      const res = await axios.post('http://localhost:8080/api/v1/user/login', input, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      } );
+
+      if(res.data.success){
+        
+        dispatch(setAuthUser(res.data.user))
+         navigate("/");
+        toast.success(res.data.message)
+           setInput({
+                    email: "",
+                    password: ""
+                });
+      }else{
+        toast.success(res.data.message)
+           setInput({
+                    email: "",
+                    password: ""
+                });
+      }
+      setLoading(false)
+      
+    } catch (error) {
+      console.log(error as Error)
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    }
+    
+  };
+
     
     return (
         <div onSubmit={loginHandler} className='flex items-center w-screen h-screen justify-center'>

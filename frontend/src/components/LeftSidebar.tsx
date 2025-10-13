@@ -7,18 +7,36 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
+import { toast } from 'sonner'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { setAuthUser } from '@/redux/authslice'
+import axios from 'axios'
 
 const LeftSidebar = () => {
     
  const likeNotification: string[] = []
+ const dispatch = useDispatch()
+ const navigate = useNavigate()
 
 
-    const logoutHandler = async () => {
-      
+   const logoutHandler = async () => {
+        try {
+            const res = await axios.get('http://localhost:8080/api/v1/user/logout', { withCredentials: true });
+            if (res.data.success) {
+                dispatch(setAuthUser(null));
+                navigate("/login");
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response.data.message);
+        }
     }
 
-    const sidebarHandler = () => {
-     
+    const sidebarHandler = (textType) => {
+     if(textType === 'Logout'){
+        logoutHandler();
+     }
     }
 
     const sidebarItems = [
@@ -48,7 +66,7 @@ const LeftSidebar = () => {
                     {
                         sidebarItems.map((item, index) => {
                             return (
-                                <div onClick={() => sidebarHandler()} key={index} className='flex items-center gap-3 relative hover:bg-gray-100 cursor-pointer rounded-lg p-3 my-3'>
+                                <div onClick={() => sidebarHandler(item.text)} key={index} className='flex items-center gap-3 relative hover:bg-gray-100 cursor-pointer rounded-lg p-3 my-3'>
                                     {item.icon}
                                     <span>{item.text}</span>
                                     {

@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios"
+import { toast } from "sonner";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -10,7 +12,8 @@ const Signup = () => {
     email: "",
     password: "",
   } satisfies Record<string, string>);
-  const loading = false;
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
 
 //   const changeEventHandler = (e: any) => {
 //   const target = e.target as HTMLInputElement
@@ -21,9 +24,48 @@ const Signup = () => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const signupHandler = (e: React.FormEvent) => {
+  const signupHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(input);
+    // console.log(input);
+
+    try {
+      setLoading(true)
+
+      const res = await axios.post('http://localhost:8080/api/v1/user/register', input, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      } );
+
+      if(res.data.success){
+        navigate('/login')
+        // console.log(res.data.)
+        toast.success(res.data.message)
+           setInput({
+                    username: "",
+                    email: "",
+                    password: ""
+                });
+      }else{
+        toast.success(res.data.message)
+           setInput({
+                    username: "",
+                    email: "",
+                    password: ""
+                });
+      }
+      setLoading(false)
+      
+    } catch (error) {
+      console.log(error as Error)
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    }
+    
   };
 
   return (

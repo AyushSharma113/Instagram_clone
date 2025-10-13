@@ -10,7 +10,7 @@ import { useState } from "react";
 import CommentDialog from "./CommentDialog";
 
 const Post = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   //     const [text, setText] = useState('');
 
   //   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -103,7 +103,7 @@ const Post = () => {
               className="cursor-pointer hover:text-gray-600"
             />
           )}
-          <MessageCircle className="cursor-pointer hover:text-gray-600" />
+          <MessageCircle onClick={() => setOpen(true)} className="cursor-pointer hover:text-gray-600" />
           <Send className="cursor-pointer hover:text-gray-600" />
         </div>
         <Bookmark className="cursor-pointer hover:text-gray-600" />
@@ -114,11 +114,11 @@ const Post = () => {
         <span className="font-medium mr-2">Ayushsharma145</span>
         this is my crush
       </p>
-      <span className="cursor-pointer text-sm text-gray-400">
+      <span onClick={() => {setOpen(true)}} className="cursor-pointer text-sm text-gray-400">
         View all comments
       </span>
 
-<CommentDialog open={open}/>
+<CommentDialog open={open} setOpen={setOpen}/>
 
       <div className="flex items-center justify-between gap-2">
         <input
