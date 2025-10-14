@@ -12,12 +12,16 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { setAuthUser } from '@/redux/authslice'
 import axios from 'axios'
+import { useState } from 'react'
+import CreatePost from './CreatePost'
 
 const LeftSidebar = () => {
     
  const likeNotification: string[] = []
  const dispatch = useDispatch()
  const navigate = useNavigate()
+ const [open, setOpen] = useState(true);
+ 
 
 
    const logoutHandler = async () => {
@@ -29,17 +33,28 @@ const LeftSidebar = () => {
                 toast.success(res.data.message);
             }
         } catch (error) {
-            toast.error(error.response.data.message);
+            if (axios.isAxiosError(error) && error.response) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         }
     }
 
-    const sidebarHandler = (textType) => {
-     if(textType === 'Logout'){
-        logoutHandler();
-     }
+    interface SidebarItem {
+        icon: React.ReactNode;
+        text: string;
     }
 
-    const sidebarItems = [
+    const sidebarHandler = (textType: string): void => {
+        if (textType === 'Logout') {
+            logoutHandler();
+        } else if (textType === 'Create') {
+            setOpen(true);
+        }
+    };
+
+    const sidebarItems: SidebarItem[] = [
         { icon: <Home />, text: "Home" },
         { icon: <Search />, text: "Search" },
         { icon: <TrendingUp />, text: "Explore" },
@@ -106,7 +121,7 @@ const LeftSidebar = () => {
                 </div>
             </div>
 
-            {/* <CreatePost open={open} setOpen={setOpen} /> */}
+            <CreatePost open={open} setOpen={setOpen} />
 
         </div>
     )
