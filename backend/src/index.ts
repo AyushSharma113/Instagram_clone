@@ -5,6 +5,7 @@ import connectDB from './utils/db.ts'
 import dotenv from "dotenv";
 import path from "path";
 import userRoute from './routes/user.route.ts'
+import postRoute from './routes/post.route.ts'
 
 const __dirname = path.resolve();
 
@@ -28,6 +29,7 @@ app.use(cors(corsOptions));
 
 
 app.use("/api/v1/user", userRoute)
+app.use('/api/v1/post', postRoute)
 
 
 app.get('/', (req, res)=> {

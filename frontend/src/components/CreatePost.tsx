@@ -6,14 +6,15 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { readFileAsDataURL } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
 
 const CreatePost = ({ open, setOpen }) => {
 const imageRef = useRef<HTMLInputElement>(null);
       const [caption, setCaption] = useState("");
       const [file, setFile] = useState("");
         const [imagePreview, setImagePreview] = useState("");
-        const loading = false
-
+const [loading, setLoading] = useState(false)
 
     
   const user = {
@@ -30,8 +31,32 @@ const imageRef = useRef<HTMLInputElement>(null);
     }
   }
   
-  const createPostHandler = () => {
+  const createPostHandler = async (e) => {
+    const formData = new FormData()
+    formData.append('caption', caption)
+    if(imagePreview) formData.append('image', file)
 
+      try {
+        setLoading(true)
+        const res = await axios.post('http://localhost:8080/api/v1/post/addpost', formData, {
+          headers: {
+            'Content-Type': "multipart/form-data"
+          },
+          withCredentials: true
+        })
+        
+        if(res.data.success){
+
+          toast.success(res.data.message)
+          setOpen(false);
+        }
+        
+      } catch (error) {
+       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+      
   }
   
   
