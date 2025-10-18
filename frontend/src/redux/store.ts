@@ -1,5 +1,6 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit"
 import authSlice from "./authslice"
+import postSlice from "./postSlice"
 import {
   persistStore,
   persistReducer,
@@ -22,7 +23,8 @@ const persistConfig = {
 
 
 const rootReducer = combineReducers({
-    auth:authSlice
+    auth:authSlice,
+    post:postSlice
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -37,5 +39,8 @@ const store = configureStore({
             },
         }),
 })
+
+
+export type RootState = ReturnType<typeof store.getState>;
 
 export default store;

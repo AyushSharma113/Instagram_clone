@@ -1,20 +1,24 @@
 import { Dialog } from "@radix-ui/react-dialog";
-import React, { useReducer, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { DialogContent, DialogHeader } from "./ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { readFileAsDataURL } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts } from "@/redux/postSlice";
+import type { RootState } from "@/redux/store";
 
-const CreatePost = ({ open, setOpen }) => {
+const CreatePost: React.FC<{ open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({ open, setOpen }) => {
 const imageRef = useRef<HTMLInputElement>(null);
-      const [caption, setCaption] = useState("");
-      const [file, setFile] = useState("");
-        const [imagePreview, setImagePreview] = useState("");
-const [loading, setLoading] = useState(false)
+      const [caption, setCaption] = useState<string>("");
+      const [file, setFile] = useState<File | null>(null);
+        const [imagePreview, setImagePreview] = useState<string>("");
+const [loading, setLoading] = useState<boolean>(false)
+const dispatch = useDispatch()
+const posts = useSelector((store: RootState)=>store.post.posts) || [];
 
     
   const user = {
@@ -22,19 +26,29 @@ const [loading, setLoading] = useState(false)
     username: "Ayush sharma"
   };
 
-  const fileChangeHandler= async(e) => {
-    const file = e.target.files[0]
-    if(file){
-        setFile(file)
-        const dataUrl = await readFileAsDataURL(file);
-      setImagePreview(dataUrl);
-    }
+const fileChangeHandler = async (
+  e: React.ChangeEvent<HTMLInputElement>
+): Promise<void> => {
+  const file = e.target.files?.[0];
+  if (file) {
+    setFile(file);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        setImagePreview(result); // Type-safe
+      }
+    };
+    reader.readAsDataURL(file);
   }
+};
+
   
-  const createPostHandler = async (e) => {
+  const createPostHandler = async (): Promise<void> => {
     const formData = new FormData()
     formData.append('caption', caption)
-    if(imagePreview) formData.append('image', file)
+    if (file) formData.append('image', file)
 
       try {
         setLoading(true)
@@ -46,13 +60,18 @@ const [loading, setLoading] = useState(false)
         })
         
         if(res.data.success){
-
+          dispatch(setPosts([res.data.post, ...posts]))
           toast.success(res.data.message)
           setOpen(false);
         }
         
-      } catch (error) {
-       toast.error(error.response.data.message);
+      } catch (error: unknown) {
+        const message = axios.isAxiosError(error) && error.response?.data?.message
+          ? String(error.response.data.message)
+          : error instanceof Error
+          ? error.message
+          : String(error);
+        toast.error(message);
     } finally {
       setLoading(false);
     }

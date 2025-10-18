@@ -2,7 +2,7 @@ import "./utils/loadEnv.ts";
 import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// import connectDB from './utils/db.ts'
+import connectDB from './utils/db.ts'
 import path from "path";
 import userRoute from './routes/user.route.ts'
 import postRoute from './routes/post.route.ts'
@@ -33,18 +33,7 @@ app.get('/', (req, res)=> {
     res.send('i am just checking')
 })
 
-const connectDB = async (): Promise<void> => {
-    try {
-        const uri = process.env.MONGO_URI as string | undefined
-        if (!uri) {
-            throw new Error('MONGO_URI is not defined in environment')
-        }
-        await mongoose.connect(uri);
-        console.log('mongodb connected successfully.');
-    } catch (error) {
-           console.error('Error connecting to MongoDB:', error);
-    }
-}
+
 
 app.listen(PORT, () => {
     connectDB();
