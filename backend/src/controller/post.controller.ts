@@ -4,6 +4,7 @@ import sharp from "sharp";
 import cloudinary from "../utils/claudinary.ts";
 import { Post } from "../model/post.model.ts";
 import { User } from "../model/user.model.ts";
+import { Comment } from "../model/comment.model.ts";
 
 
 
@@ -34,7 +35,7 @@ export const addNewPost = async (req: CustomRequest, res: Response): Promise<Res
 
         const post = await Post.create({
             caption,
-            Image: cloudResponse.secure_url,
+            image: cloudResponse.secure_url,
             author: authorId
         })
         
