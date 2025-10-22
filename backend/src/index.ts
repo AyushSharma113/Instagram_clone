@@ -6,7 +6,6 @@ import connectDB from './utils/db.ts'
 import path from "path";
 import userRoute from './routes/user.route.ts'
 import postRoute from './routes/post.route.ts'
-import mongoose from "mongoose";
 
 
 
