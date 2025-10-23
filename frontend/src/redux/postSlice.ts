@@ -1,10 +1,20 @@
+import type { Post } from "@/types/post";
 import { createSlice } from "@reduxjs/toolkit";
+
+
+
+interface PostState {
+  posts: Post[];
+}
+
+const initialState: PostState = {
+  posts: [],
+};
+
 
 const postSlice = createSlice({
   name: "post",
-  initialState: {
-    posts: [],
-  },
+ initialState,
 
   reducers: {
     // actions

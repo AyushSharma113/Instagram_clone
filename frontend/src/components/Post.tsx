@@ -9,43 +9,12 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useState } from "react";
 import CommentDialog from "./CommentDialog";
 
-const Post = () => {
+const Post = ({post}) => {
   const [open, setOpen] = useState(false);
-  //     const [text, setText] = useState('');
+  const [comment, setComment] = useState(post.comments)
+  
 
-  //   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
-  //     const inputText = e.target.value;
-  //     if (inputText.trim()) {
-  //         setText(inputText);
-  //     } else {
-  //         setText("");
-  //     }
-  // };
 
-  //     const commentHandler = ()=>{
-  //       setOpen(prev => !prev)
-  //     }
-
-  const dummyPost = {
-    author: {
-      username: "john_doe",
-      profilePicture: "https://via.placeholder.com/40",
-      _id: "123",
-    },
-    image:
-      "https://deadline.com/wp-content/uploads/2025/09/Emmy-Watson.jpg?w=681&h=383&crop=1",
-    caption: "This is a dummy caption for the post.",
-  };
-
-  const dummyUser = {
-    _id: "123", // same as author to show 'Author' badge
-  };
-
-  //   const dummyLikes = 123;
-  //   const dummyComments = [
-  //     { id: 1, text: "Nice post!" },
-  //     { id: 2, text: "Awesome!" },
-  //   ];
 
   const liked = false;
 
@@ -55,13 +24,13 @@ const Post = () => {
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarImage
-              src={dummyPost.author?.profilePicture}
+              src={post.author?.profilePicture}
               alt="post_image"
             />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex items-center gap-3 ">
-            <h1>Ayush sharma</h1>
+            <h1>{post.author?.username}</h1>
             <Badge variant={"secondary"}>Author</Badge>
           </div>
         </div>
@@ -89,14 +58,14 @@ const Post = () => {
 
       <img
         className="rounded-sm my-2 aspect-square object-cover w-full "
-        src={dummyPost.image}
+        src={post.image}
         alt="post_img"
       />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {liked ? (
-            <FaHeart size={"24"} className="cursor-pointer text-red-600" />
+            <FaHeart size={"24"} className="cursor-pointer  text-red-600" />
           ) : (
             <FaRegHeart
               size={"24"}
@@ -108,15 +77,22 @@ const Post = () => {
         </div>
         <Bookmark className="cursor-pointer hover:text-gray-600" />
       </div>
-      <span className="font-medium block mb-2">123 likes</span>
+      <span className="font-medium block mb-2">{`${post.likes?.length} likes`}</span>
 
       <p>
-        <span className="font-medium mr-2">Ayushsharma145</span>
-        this is my crush
+        <span className="font-medium mr-2">{post.author?.username}</span>
+        {post.caption}
       </p>
+
+      {
+        comment.length > 0 && (
+
       <span onClick={() => {setOpen(true)}} className="cursor-pointer text-sm text-gray-400">
-        View all comments
+       view all {comment.length} comments
       </span>
+        )
+      }
+      
 
 <CommentDialog open={open} setOpen={setOpen}/>
 

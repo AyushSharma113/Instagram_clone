@@ -12,73 +12,72 @@ import { setPosts } from "@/redux/postSlice";
 import type { RootState } from "@/redux/store";
 
 const CreatePost: React.FC<{ open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({ open, setOpen }) => {
-const imageRef = useRef<HTMLInputElement>(null);
-      const [caption, setCaption] = useState<string>("");
-      const [file, setFile] = useState<File | null>(null);
-        const [imagePreview, setImagePreview] = useState<string>("");
-const [loading, setLoading] = useState<boolean>(false)
-const dispatch = useDispatch()
-const posts = useSelector((store: RootState)=>store.post.posts) || [];
+  const imageRef = useRef<HTMLInputElement>(null);
+  const [caption, setCaption] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const {posts} = useSelector((store: RootState) => store.post) || [];
+  const {user} = useSelector((store: RootState)=> store.auth)
 
-    
-  const user = {
-    profilePicture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxaARPwKgt1F7kgIs4K9Ezyzpy5iCPNtVp2ZMPi6wqu1wuttoTEPc49jXz2Fm8AmA-gEs&usqp=CAU",
-    username: "Ayush sharma"
-  };
-
-const fileChangeHandler = async (
-  e: React.ChangeEvent<HTMLInputElement>
-): Promise<void> => {
-  const file = e.target.files?.[0];
-  if (file) {
-    setFile(file);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result === "string") {
-        setImagePreview(result); // Type-safe
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-};
 
   
-  const createPostHandler = async (): Promise<void> => {
-    const formData = new FormData()
-    formData.append('caption', caption)
-    if (file) formData.append('image', file)
+  const fileChangeHandler = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFile(file);
 
-      try {
-        setLoading(true)
-        const res = await axios.post('http://localhost:8080/api/v1/post/addpost', formData, {
-          headers: {
-            'Content-Type': "multipart/form-data"
-          },
-          withCredentials: true
-        })
-        
-        if(res.data.success){
-          dispatch(setPosts([res.data.post, ...posts]))
-          toast.success(res.data.message)
-          setOpen(false);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result;
+        if (typeof result === "string") {
+          setImagePreview(result); // Type-safe
         }
-        
-      } catch (error: unknown) {
-        const message = axios.isAxiosError(error) && error.response?.data?.message
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const createPostHandler = async (): Promise<void> => {
+    const formData = new FormData();
+    formData.append("caption", caption);
+    if (file) formData.append("image", file);
+
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        "http://localhost:8080/api/v1/post/addpost",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        dispatch(setPosts([res.data.post, ...posts]));
+        toast.success(res.data.message);
+        setOpen(false);
+      }
+    } catch (error: unknown) {
+      const message =
+        axios.isAxiosError(error) && error.response?.data?.message
           ? String(error.response.data.message)
           : error instanceof Error
           ? error.message
           : String(error);
-        toast.error(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
-      
-  }
-  
-  
+  };
+    
+    
   return (
     <Dialog open={open}>
       <DialogContent onInteractOutside={() => setOpen(false)}>

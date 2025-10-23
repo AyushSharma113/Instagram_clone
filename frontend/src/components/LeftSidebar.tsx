@@ -8,19 +8,21 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { toast } from 'sonner'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { setAuthUser } from '@/redux/authslice'
+import { clearUser } from '@/redux/authslice'
 import axios from 'axios'
 import { useState } from 'react'
 import CreatePost from './CreatePost'
+import type { RootState } from '@/redux/store'
 
 const LeftSidebar = () => {
     
  const likeNotification: string[] = []
  const dispatch = useDispatch()
  const navigate = useNavigate()
- const [open, setOpen] = useState(true);
+ const [open, setOpen] = useState(false);
+ const {user} = useSelector((store: RootState)=> store.auth)
  
 
 
@@ -28,7 +30,7 @@ const LeftSidebar = () => {
         try {
             const res = await axios.get('http://localhost:8080/api/v1/user/logout', { withCredentials: true });
             if (res.data.success) {
-                dispatch(setAuthUser(null));
+                dispatch(clearUser());
                 navigate("/login");
                 toast.success(res.data.message);
             }
@@ -51,6 +53,8 @@ const LeftSidebar = () => {
             logoutHandler();
         } else if (textType === 'Create') {
             setOpen(true);
+        } else if (textType === 'Profile'){
+            navigate(`/profile/${user?._id}`)
         }
     };
 
