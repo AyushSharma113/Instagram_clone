@@ -9,6 +9,8 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false
+  userProfile:null,
+
 };
 
 const authSlice = createSlice({

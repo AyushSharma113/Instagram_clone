@@ -8,25 +8,27 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 // import CommentDialog from "./CommentDialog";
 import { useState } from "react";
 import CommentDialog from "./CommentDialog";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
-const Post = ({post}) => {
+const Post = ({ post }) => {
   const [open, setOpen] = useState(false);
-  const [comment, setComment] = useState(post.comments)
-  
-
-
+  const [comment, setComment] = useState(post.comments);
+  const { user } = useSelector((store: RootState) => store.auth);
 
   const liked = false;
+
+  const deletePostHandler = () => {
+    
+  }
+  
 
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarImage
-              src={post.author?.profilePicture}
-              alt="post_image"
-            />
+            <AvatarImage src={post.author?.profilePicture} alt="post_image" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex items-center gap-3 ">
@@ -40,18 +42,23 @@ const Post = ({post}) => {
             <MoreHorizontal className="cursor-pointer" />
           </DialogTrigger>
           <DialogContent className="flex flex-col items-center text-sm text-center">
-            <Button
-              variant={"ghost"}
-              className="cursor-pointer w-fit text-[#ED4956] font-bold"
-            >
-              Delete
-            </Button>
+            {post?.author?._id !== user?._id && (
+              <Button
+                variant="ghost"
+                className="cursor-pointer w-fit text-[#ED4956] font-bold"
+              >
+                Unfollow
+              </Button>
+            )}
             <Button variant="ghost" className="cursor-pointer w-fit">
               Add to favorites
             </Button>
-            <Button variant="ghost" className="cursor-pointer w-fit">
-              Unfollow
-            </Button>
+
+            {user && user?._id === post?.author._id && (
+              <Button onClick={deletePostHandler} variant="ghost" className="cursor-pointer w-fit">
+                Delete
+              </Button>
+            )}
           </DialogContent>
         </Dialog>
       </div>
@@ -72,7 +79,10 @@ const Post = ({post}) => {
               className="cursor-pointer hover:text-gray-600"
             />
           )}
-          <MessageCircle onClick={() => setOpen(true)} className="cursor-pointer hover:text-gray-600" />
+          <MessageCircle
+            onClick={() => setOpen(true)}
+            className="cursor-pointer hover:text-gray-600"
+          />
           <Send className="cursor-pointer hover:text-gray-600" />
         </div>
         <Bookmark className="cursor-pointer hover:text-gray-600" />
@@ -84,17 +94,18 @@ const Post = ({post}) => {
         {post.caption}
       </p>
 
-      {
-        comment.length > 0 && (
+      {comment.length > 0 && (
+        <span
+          onClick={() => {
+            setOpen(true);
+          }}
+          className="cursor-pointer text-sm text-gray-400"
+        >
+          view all {comment.length} comments
+        </span>
+      )}
 
-      <span onClick={() => {setOpen(true)}} className="cursor-pointer text-sm text-gray-400">
-       view all {comment.length} comments
-      </span>
-        )
-      }
-      
-
-<CommentDialog open={open} setOpen={setOpen}/>
+      <CommentDialog open={open} setOpen={setOpen} />
 
       <div className="flex items-center justify-between gap-2">
         <input
