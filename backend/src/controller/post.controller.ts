@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { CustomRequest } from "../types/post-request.ts";
+import type { CustomRequest } from "../types/custom-request.ts";
 import sharp from "sharp";
 import cloudinary from "../utils/claudinary.ts";
 import { Post } from "../model/post.model.ts";
@@ -225,7 +225,7 @@ export const addComment = async (
   }
 };
 
-export const getCommentOfPost = async (
+export const getCommentsOfPost = async (
   req: CustomRequest,
   res: Response
 ): Promise<Response | void> => {
@@ -314,9 +314,16 @@ export const bookmarkPost = async (
 
     const user = await User.findById(authorId);
 
+    // ensure user exists
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+
     // already bookmarked -> remove from the bookmark
-    if (user?.bookmarks.includes(post._id)) {
-      await user.updateOne({ $pull: { bookmarks: post } });
+    if (user.bookmarks.includes(post._id)) {
+      await user.updateOne({ $pull: { bookmarks: post._id } });
       await user.save();
       return res
         .status(200)
@@ -326,14 +333,13 @@ export const bookmarkPost = async (
           success: true,
         });
     } else {
-      // bookmark krna pdega
+      // bookmark
       await user.updateOne({ $addToSet: { bookmarks: post._id } });
       await user.save();
       return res
         .status(200)
         .json({ type: "saved", message: "Post bookmarked", success: true });
     }
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({

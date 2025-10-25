@@ -8,20 +8,42 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 // import CommentDialog from "./CommentDialog";
 import { useState } from "react";
 import CommentDialog from "./CommentDialog";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { toast } from "sonner";
+import axios from "axios";
+import { setPosts } from "@/redux/postSlice";
 
 const Post = ({ post }) => {
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState(post.comments);
   const { user } = useSelector((store: RootState) => store.auth);
+  const { posts } = useSelector((store: RootState) => store.post);
+  const dispatch = useDispatch();
 
   const liked = false;
 
-  const deletePostHandler = () => {
-    
-  }
-  
+  const deletePostHandler = async () => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:8080/api/v1/post/delete/${post?._id}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        const updatedPostData = posts.filter(
+          (postItem) => postItem?._id !== post?._id
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    }
+  };
 
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
@@ -55,7 +77,11 @@ const Post = ({ post }) => {
             </Button>
 
             {user && user?._id === post?.author._id && (
-              <Button onClick={deletePostHandler} variant="ghost" className="cursor-pointer w-fit">
+              <Button
+                onClick={deletePostHandler}
+                variant="ghost"
+                className="cursor-pointer w-fit"
+              >
                 Delete
               </Button>
             )}
