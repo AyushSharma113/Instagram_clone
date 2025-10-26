@@ -175,6 +175,12 @@ export const dislikePost = async (
     // dislike logic here
     await post.updateOne({ $pull: { likes: userWhoDislikes } });
     await post.save();
+
+      return res.status(200).json({
+      message: "Post disliked",
+      success: true,
+    });
+    
   } catch (error) {
     console.log(error);
     return res.status(500).json({

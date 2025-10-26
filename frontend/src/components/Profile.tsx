@@ -8,6 +8,7 @@ import { AtSign, Heart, MessageCircle } from "lucide-react";
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('posts')
   
+  
   const userProfile = {
     username: "Ayush kumar sharma",
     profilePicture: "https://i.pravatar.cc/150?img=5",

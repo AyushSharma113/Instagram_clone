@@ -1,29 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { MoreHorizontal } from "lucide-react";
 import Comment from "./comment";
 import { Button } from "./ui/button";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+import type { Comment as CommentType } from "@/types/post";
+import axios from "axios";
+import { setPosts } from "@/redux/postSlice";
+import { toast } from "sonner";
 
-const dummyPost = {
-  _id: "1",
-  image:
-    "https://deadline.com/wp-content/uploads/2025/09/Emmy-Watson.jpg?w=681&h=383&crop=1",
-  author: {
-    username: "john_doe",
-    profilePicture: "https://via.placeholder.com/100",
-  },
-  comments: [
-    { _id: "c1", text: "Nice post!", author: { username: "alice" } },
-    { _id: "c2", text: "Looks great!", author: { username: "bob" } },
-  ],
-  };
 
-const CommentDialog = ({ open, setOpen }) => {
-  const [text, setText] = useState()
+const CommentDialog: React.FC<{ open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({ open, setOpen }) => {
+  const [text, setText] = useState('')
+  const {selectedPost, posts} = useSelector((store: RootState)=> store.post)
+    const [comment, setComment] = useState<CommentType[]>([]);
+  const dispatch = useDispatch(); 
 
-  const changeEventHandler = (e)=>{
+    useEffect(() => {
+    if (selectedPost) {
+      setComment(selectedPost.comments);
+    } 
+  }, [selectedPost]);
+  
+
+  const changeEventHandler = (e: ChangeEvent<HTMLInputElement>)=>{
     const inputText = e.target.value;
     if(inputText.trim()){
       setText(inputText)
@@ -32,9 +35,30 @@ const CommentDialog = ({ open, setOpen }) => {
     }
   }
   
-  const sendMessageHandler = () => {
-    console.log(text)
-  }
+  const sendMessageHandler = async () => {
+try {
+  const res = await axios.post(`http://localhost:8080/api/v1/post/${selectedPost?._id}/comment`, { text }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+  
+       if (res.data.success) {
+        const updatedCommentData = [...comment, res.data.comment];
+        setComment(updatedCommentData);
+
+        const updatedPostData = posts.map(p =>
+          p._id === selectedPost?._id ? { ...p, comments: updatedCommentData } : p
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+        setText("");
+      }
+      
+} catch (error) {
+  console.log(error)
+}  }
   
   
   return (
@@ -43,7 +67,7 @@ const CommentDialog = ({ open, setOpen }) => {
         <div className="flex flex-1">
           <div className="w-1/2">
             <img
-              src={dummyPost.image}
+              src={selectedPost?.image}
               alt="image"
               className="w-full h-full object-cover rounded-l-lg"
             />
@@ -55,13 +79,13 @@ const CommentDialog = ({ open, setOpen }) => {
               <div className="flex gap-3 items-center">
                 <Link to={"/"}>
                   <Avatar>
-                    <AvatarImage src={dummyPost.author.profilePicture} />
+                    <AvatarImage src={selectedPost?.author.profilePicture} />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </Link>
                 <div>
                   <Link to={"/"} className="font-semibold text-xs">
-                    {dummyPost.author.username}
+                    {selectedPost?.author.username}
                   </Link>
                 </div>
               </div>
@@ -81,7 +105,7 @@ const CommentDialog = ({ open, setOpen }) => {
              <hr />
              <div>
               {
-                dummyPost.comments.map((comment) => <Comment key={comment._id} comment={comment}/>)
+                comment.map((comment) => <Comment key={comment._id} comment={comment}/>)
               }
              </div>
              

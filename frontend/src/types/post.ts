@@ -1,4 +1,6 @@
 // src/types/post.ts
+import type { Comment } from './comment'
+
 export interface Post {
   _id: string;
   author: {
@@ -8,8 +10,8 @@ export interface Post {
   };
   caption: string;
   image: string;
-  comments: unknown;
-  likes: unknown;
+   likes: string[];       // array of user IDs
+  comments: Comment[];   // array of comment objects
   createdAt: string;
   updatedAt: string;
   __v: number;

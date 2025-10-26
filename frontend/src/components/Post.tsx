@@ -12,16 +12,75 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import axios from "axios";
-import { setPosts } from "@/redux/postSlice";
+import { setPosts, setSelectedPost } from "@/redux/postSlice";
+import type { Post } from "@/types/post";
 
-const Post = ({ post }) => {
+interface PostProps {
+  post: Post;
+}
+
+const Post: React.FC<PostProps> = ({ post }) => {
   const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
   const [comment, setComment] = useState(post.comments);
   const { user } = useSelector((store: RootState) => store.auth);
   const { posts } = useSelector((store: RootState) => store.post);
+  const [liked, setLiked] = useState(
+    user ? post.likes.includes(user._id) || false : null
+  );
+  const [postLike, setPostLike] = useState(post.likes.length);
   const dispatch = useDispatch();
 
-  const liked = false;
+  // if(user){
+  //   setLiked(post.likes.includes(user._id)|| false)
+  // }
+
+  const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const inputText = e.target.value;
+    if (inputText.trim()) {
+      setText(inputText);
+    } else {
+      setText("");
+    }
+  };
+
+  const likeOrDislikeHandler = async () => {
+    if (!user) {
+      toast.error("You must be logged in to like a post");
+      return;
+    }
+    const userId = user._id;
+    try {
+      const action = liked ? "dislike" : "like";
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/post/${post?._id}/${action}`,
+        { withCredentials: true }
+      );
+
+      console.log(res.data);
+      if (res.data.success) {
+        const updatedLikes = liked ? postLike - 1 : postLike + 1;
+        setPostLike(updatedLikes);
+        setLiked(!liked);
+
+        // apne post ko update krunga
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id
+            ? {
+                ...p,
+                likes: liked
+                  ? p?.likes.filter((id) => id !== userId)
+                  : [...p.likes, userId],
+              }
+            : p
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const deletePostHandler = async () => {
     try {
@@ -44,6 +103,49 @@ const Post = ({ post }) => {
       }
     }
   };
+
+  const commentHandler = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/v1/post/${post._id}/comment`,
+        { text },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        const updateComment = [...comment, res.data.comment];
+        setComment(updateComment);
+
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id ? { ...p, comments: updateComment } : p
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+        setText("");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  
+    const bookmarkHandler = async () => {
+        try {
+            const res = await axios.get(`http://localhost:8080/api/v1/post/${post?._id}/bookmark`, {withCredentials:true});
+            if(res.data.success){
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+  
 
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
@@ -98,20 +200,29 @@ const Post = ({ post }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {liked ? (
-            <FaHeart size={"24"} className="cursor-pointer  text-red-600" />
+            <FaHeart
+              onClick={likeOrDislikeHandler}
+              size={"24"}
+              className="cursor-pointer  text-red-600"
+            />
           ) : (
             <FaRegHeart
               size={"24"}
+              onClick={likeOrDislikeHandler}
               className="cursor-pointer hover:text-gray-600"
             />
           )}
           <MessageCircle
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              // ensure the global selectedPost is set so the CommentDialog shows this post's comments
+              dispatch(setSelectedPost(post));
+              setOpen(true);
+            }}
             className="cursor-pointer hover:text-gray-600"
           />
-          <Send className="cursor-pointer hover:text-gray-600" />
+          <Send   className="cursor-pointer hover:text-gray-600" />
         </div>
-        <Bookmark className="cursor-pointer hover:text-gray-600" />
+        <Bookmark onClick={bookmarkHandler} className="cursor-pointer hover:text-gray-600" />
       </div>
       <span className="font-medium block mb-2">{`${post.likes?.length} likes`}</span>
 
@@ -120,14 +231,16 @@ const Post = ({ post }) => {
         {post.caption}
       </p>
 
+
       {comment.length > 0 && (
         <span
           onClick={() => {
+            dispatch(setSelectedPost(post));
             setOpen(true);
           }}
           className="cursor-pointer text-sm text-gray-400"
         >
-          view all {comment.length} comments
+          View all {comment.length} comments
         </span>
       )}
 
@@ -137,9 +250,17 @@ const Post = ({ post }) => {
         <input
           type="text"
           placeholder="add your comment"
+          onChange={changeEventHandler}
           className=" text-sm w-full"
         />
-        <span className="text-[#3BADF8] cursor-pointer">Post</span>
+        {text && (
+          <span
+            onClick={commentHandler}
+            className="text-[#3BADF8] cursor-pointer"
+          >
+            Post
+          </span>
+        )}
       </div>
     </div>
   );
