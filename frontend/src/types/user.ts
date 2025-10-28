@@ -9,4 +9,5 @@ export interface User {
   followers: string[]; // or maybe User[] if you populate them later
   following: string[];
   posts: Post[];
+  bookmarks: string[];
 }

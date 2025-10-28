@@ -1,58 +1,27 @@
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Badge } from "./ui/badge";
 import { AtSign, Heart, MessageCircle } from "lucide-react";
+import useGetUserProfile from "@/hooks/useGetUserProfile";
+import type { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
+  const params = useParams();
+  const userId: string = params.id || '';
+  useGetUserProfile(userId)
   const [activeTab, setActiveTab] = useState('posts')
   
-  
-  const userProfile = {
-    username: "Ayush kumar sharma",
-    profilePicture: "https://i.pravatar.cc/150?img=5",
-    posts: [
-      {
-        _id: 1,
-        image: "https://picsum.photos/400?random=1",
-        likes: [1, 2, 3],
-        comments: [1, 2],
-      },
-      {
-        _id: 2,
-        image: "https://picsum.photos/400?random=2",
-        likes: [1],
-        comments: [1, 2, 3],
-      },
-      {
-        _id: 3,
-        image: "https://picsum.photos/400?random=3",
-        likes: [],
-        comments: [],
-      },
-      {
-        _id: 4,
-        image: "https://picsum.photos/400?random=4",
-        likes: [1, 2, 3, 4],
-        comments: [1],
-      },
-      {
-        _id: 5,
-        image: "https://picsum.photos/400?random=5",
-        likes: [1],
-        comments: [],
-      },
-    ],
-    followers: [1, 2, 3, 4, 5, 6],
-    following: [1, 2, 3],
-    bio: "Fullstack Developer | Building cool stuff 🚀",
-  };
+  const { userProfile, user } = useSelector((store: RootState) => store.auth);
 
-  const displayedPosts = userProfile.posts;
+  // console.log(userProfile)
   
+  const displayedPost = activeTab === 'posts' ? userProfile?.posts : userProfile?.bookmarks;
+   
 
-  const isLoggedInUserProfile: boolean = false;
+  const isLoggedInUserProfile: boolean = userId === userProfile?._id;
   const isFollowing: boolean = false;
 
   const handleTabChange = (tab)=> setActiveTab(tab)
@@ -77,7 +46,7 @@ const Profile = () => {
           <section>
             <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2">
-                <span>{userProfile.username}</span>
+                <span>{userProfile?.username}</span>
                 {isLoggedInUserProfile ? (
                   <>
                     <Link to="/account/edit">
@@ -169,19 +138,19 @@ const Profile = () => {
 
 {/* posts grid  */}
 <div className="grid grid-cols-3 gap-1">
-  {displayedPosts.map((post) => (
-    <div key={post._id} className="relative group cursor-pointer">
-      <img src={post.image} alt="post image" className="rounded-sm my-2 w-full aspect-square object-cover" />
+  {displayedPost?.map((post) => (
+    <div key={post?._id} className="relative group cursor-pointer">
+      <img src={post?.image} alt="post image" className="rounded-sm my-2 w-full aspect-square object-cover" />
       <div className="absolute inset-0 flex items-center justify-center bg-black/35 bg-opacity-5
       opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex items-center text-white space-x-4">
                     <button className="flex items-center gap-2 hover:text-gray-300">
             <Heart size={18} />
-            <span>{post.likes.length}</span>
+            <span>{post?.likes.length}</span>
           </button>
                     <button className="flex items-center gap-2 hover:text-gray-300">
             <MessageCircle size={18} />
-            <span>{post.comments.length}</span>
+            <span>{post?.comments.length}</span>
           </button>
         </div>
       </div>
