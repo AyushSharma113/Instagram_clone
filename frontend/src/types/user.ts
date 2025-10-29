@@ -5,6 +5,7 @@ export interface User {
   username: string;
   email: string;
   bio?: string;
+  gender?: string;
   profilePicture?: string;
   followers: string[]; // or maybe User[] if you populate them later
   following: string[];

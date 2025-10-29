@@ -4,6 +4,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  suggestedUsers: string[]
   userProfile: User | null;
   selectedUser: User | null,
 }
@@ -11,6 +12,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
+  suggestedUsers:[],
   userProfile: null,
   selectedUser:null,
 };

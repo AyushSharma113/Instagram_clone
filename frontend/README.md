@@ -72,3 +72,12 @@ export default tseslint.config([
 <!-- git fetch origin
 git reset --hard origin/main -->
 
+
+<!-- - set up functionalities for the edit profile  -->
+- set up follow / unfollow functionalities
+- build chat page and message page
+- set up functionalities for chat and message
+- implement socket io for real time like
+- implement protected routes
+- deploy
+
