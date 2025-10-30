@@ -7,6 +7,7 @@ import { AtSign, Heart, MessageCircle } from "lucide-react";
 import useGetUserProfile from "@/hooks/useGetUserProfile";
 import type { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
+import useFollowToggle from "@/hooks/useFollowToggle";
 
 const Profile = () => {
   const params = useParams();
@@ -15,14 +16,13 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('posts')
   
   const { userProfile, user } = useSelector((store: RootState) => store.auth);
-
-  // console.log(userProfile)
-  
+  const { toggleFollow } = useFollowToggle();
   const displayedPost = activeTab === 'posts' ? userProfile?.posts : userProfile?.bookmarks;
    
 
-  const isLoggedInUserProfile: boolean = userId === userProfile?._id;
-  const isFollowing: boolean = false;
+  const isLoggedInUserProfile = user?._id === userProfile?._id;
+  console.log(isLoggedInUserProfile + 'is logged in user ')
+  const isFollowing: boolean = Boolean(user && userProfile?._id && user.following.includes(userProfile._id));
 
   const handleTabChange = (tab)=> setActiveTab(tab)
   
@@ -72,7 +72,7 @@ const Profile = () => {
                   </>
                 ) : isFollowing ? (
                   <>
-                    <Button className="h-8" variant={"secondary"}>
+                    <Button className="h-8" onClick={()=> toggleFollow(userProfile?._id)} variant={"secondary"}>
                       Unfollow
                     </Button>
                     <Button className="h-8" variant={"secondary"}>
@@ -83,6 +83,7 @@ const Profile = () => {
                   <Button
                     variant={"secondary"}
                     className="bg-[#0095F6] hover:bg-[#3192d2] h-8"
+                    onClick={()=> toggleFollow(userProfile?._id)}
                   >
                     Follow
                   </Button>

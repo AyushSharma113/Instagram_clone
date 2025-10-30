@@ -1,6 +1,8 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit"
 import authSlice from "./authslice"
 import postSlice from "./postSlice"
+import chatSlice from './chatSlice'
+
 import {
   persistStore,
   persistReducer,
@@ -24,7 +26,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     auth:authSlice,
-    post:postSlice
+    post:postSlice,
+    chat:chatSlice
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

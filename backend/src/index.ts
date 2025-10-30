@@ -6,6 +6,7 @@ import connectDB from './utils/db.ts'
 import path from "path";
 import userRoute from './routes/user.route.ts'
 import postRoute from './routes/post.route.ts'
+import messageRoute from './routes/message.route.ts'
 
 
 
@@ -26,6 +27,7 @@ app.use(cors(corsOptions));
 
 app.use("/api/v1/user", userRoute)
 app.use('/api/v1/post', postRoute)
+app.use('/api/v1/message', messageRoute)
 
 
 app.get('/', (req, res)=> {

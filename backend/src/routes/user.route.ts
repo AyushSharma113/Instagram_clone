@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, logout, getProfile, editProfile } from '../controller/user.controller.ts';
+import { register, login, logout, getProfile, editProfile, getSuggestedUsers, followOrUnfollow } from '../controller/user.controller.ts';
 import isAuthenticated from '../middlewares/isAuthenticated.ts'
 import upload from '../middlewares/multer.ts';
 
@@ -11,6 +11,8 @@ router.route('/login').post(login);
 router.route('/logout').get(logout);
 router.route('/:id/profile').get(isAuthenticated, getProfile);
 router.route('/profile/edit').post(isAuthenticated, upload.single('profilePhoto'), editProfile);
+router.route('/suggested').get(isAuthenticated, getSuggestedUsers);
+router.route('/followorunfollow/:id').post(isAuthenticated, followOrUnfollow);
 
 
 export default router
