@@ -9,12 +9,13 @@ import { Button } from "./ui/button";
 import axios from "axios";
 import { setMessages } from "@/redux/chatSlice";
 import Messages from "./Messages";
+import useGetRTM from "@/hooks/useGetRTM";
 
 const ChatPage = () => {
+  useGetRTM()
   const [textMessage, setTextMessage] = useState("");
   const dispatch = useDispatch();
 
-  const isOnline = false;
   
   const { user, suggestedUsers, selectedUser } = useSelector(
     (store: RootState) => store.auth
@@ -57,7 +58,7 @@ const ChatPage = () => {
         <hr className="mb-4 border-gray-300" />
         <div className="overflow-y-auto h-[80vh]">
           {suggestedUsers.map((suggestedUser) => {
-            // const isOnline = onlineUsers.includes(suggestedUser?._id);
+            const isOnline = onlineUsers.includes(suggestedUser?._id);
             return (
               <div
                 onClick={() => dispatch(setSelectedUser(suggestedUser))}

@@ -7,12 +7,12 @@ import path from "path";
 import userRoute from './routes/user.route.ts'
 import postRoute from './routes/post.route.ts'
 import messageRoute from './routes/message.route.ts'
+import { app, server } from "./socket/socket.ts";
 
 
 
 const PORT = process.env.PORT || 3000;
 
-const app = express()
 
 //middlewares
 app.use(express.json());
@@ -36,7 +36,7 @@ app.get('/', (req, res)=> {
 
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     connectDB();
     console.log(`server is running at port ${PORT}`);
 });

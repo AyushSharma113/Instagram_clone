@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import type { CustomRequest } from "../types/custom-request.ts";
 import { Conversation } from "../model/conversation.model.ts";
 import { Message } from "../model/message.model.ts";
+import { getReceiverSocketId, io } from "../socket/socket.ts";
 
 export const sendMessage = async (
   req: CustomRequest,
@@ -34,6 +35,10 @@ export const sendMessage = async (
     await Promise.all([conversation.save(), newMessage.save()]);
 
     // implement socket io for real time data transfer
+       const receiverSocketId = getReceiverSocketId(receiverId);
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit('newMessage', newMessage);
+        }
 
     return res.status(201).json({
       success: true,
