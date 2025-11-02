@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -14,6 +16,7 @@ const Signup = () => {
   } satisfies Record<string, string>);
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
+  const {user} = useSelector((store: RootState)=> store.auth)
 
 //   const changeEventHandler = (e: any) => {
 //   const target = e.target as HTMLInputElement
@@ -68,6 +71,12 @@ const Signup = () => {
     
   };
 
+   useEffect(()=>{
+          if(user){
+              navigate("/");
+          }
+      },[])
+  
   return (
     <div className="flex items-center w-screen h-screen justify-center">
       <form

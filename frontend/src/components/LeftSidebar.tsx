@@ -18,7 +18,7 @@ import type { RootState } from '@/redux/store'
 
 const LeftSidebar = () => {
     
- const likeNotification: string[] = []
+    const { likeNotification } = useSelector((store: RootState) => store.realTimeNotification);
  const dispatch = useDispatch()
  const navigate = useNavigate()
  const [open, setOpen] = useState(false);
@@ -106,12 +106,10 @@ const LeftSidebar = () => {
                                                                     return (
                                                                         <div  className='flex items-center gap-2 my-2'>
                                                                             <Avatar>
-                                                                                {/* <AvatarImage src={notification?.userDetails?.profilePicture} /> */}
-                                                                                <AvatarImage  />
+                                                                                <AvatarImage src={notification?.userDetails?.profilePicture} />
                                                                                 <AvatarFallback>CN</AvatarFallback>
                                                                             </Avatar>
-                                                                            {/* <p className='text-sm'><span className='font-bold'>{notification?.userDetails?.username}</span> liked your post</p> */}
-                                                                            <p className='text-sm'><span className='font-bold'>ayush</span> liked your post</p>
+                                                                            <p className='text-sm'><span className='font-bold'>{notification?.userDetails?.username}</span> liked your post</p>
                                                                         </div>
                                                                     )
                                                                 })
