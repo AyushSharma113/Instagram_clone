@@ -7,7 +7,7 @@ import { setSelectedUser } from "@/redux/authslice";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import axios from "axios";
-import { setMessages } from "@/redux/chatSlice";
+import { addMessage, setMessages } from "@/redux/chatSlice";
 import Messages from "./Messages";
 import useGetRTM from "@/hooks/useGetRTM";
 
@@ -24,6 +24,8 @@ const ChatPage = () => {
     (store: RootState) => store.chat
   );
 
+  // console.log(messages)
+  
   const sendMessageHandler = async (receiverId) => {
     try {
       const res = await axios.post(
@@ -37,7 +39,7 @@ const ChatPage = () => {
         }
       );
       if (res.data.success) {
-        dispatch(setMessages([...messages, res.data.newMessage]));
+        dispatch(addMessage(res.data.newMessage));
         setTextMessage("");
       }
     } catch (error) {
